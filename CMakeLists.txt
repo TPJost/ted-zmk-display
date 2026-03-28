@@ -5,4 +5,5 @@ zephyr_library()
 zephyr_library_sources(
     src/custom_status_screen.c
     src/widgets/status.c
+    src/widgets/util.c
 )
