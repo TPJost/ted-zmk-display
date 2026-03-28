@@ -1,2 +1,7 @@
 menu "Ted display module"
+
+config ZMK_VFX_TED_DISPLAY
+    bool "Enable Ted display module"
+    default y
+
 endmenu
