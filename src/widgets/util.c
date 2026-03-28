@@ -6,6 +6,7 @@
  */
 
 #include <zephyr/kernel.h>
+
 #include "util.h"
 
 LV_IMG_DECLARE(bolt);
@@ -23,6 +24,7 @@ void rotate_canvas(lv_obj_t *canvas) {
 void draw_battery(lv_obj_t *canvas, const struct status_state *state) {
     lv_draw_rect_dsc_t rect_black_dsc;
     init_rect_dsc(&rect_black_dsc, LVGL_BACKGROUND);
+
     lv_draw_rect_dsc_t rect_white_dsc;
     init_rect_dsc(&rect_white_dsc, LVGL_FOREGROUND);
 
@@ -79,6 +81,7 @@ void canvas_draw_line(lv_obj_t *canvas, const lv_point_t points[], uint32_t poin
 
     lv_canvas_finish_layer(canvas, &layer);
 }
+
 void canvas_draw_rect(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
                       lv_draw_rect_dsc_t *draw_dsc) {
     lv_layer_t layer;
