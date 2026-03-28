@@ -4,4 +4,8 @@ config NICE_VIEW_WIDGET_STATUS
     bool "Enable Ted custom status widget"
     default y
 
+config NICE_VIEW_WIDGET_INVERTED
+    bool "Invert Ted status widget colors"
+    default n
+
 endmenu
