@@ -7,4 +7,6 @@ zephyr_library_sources(
     src/widgets/status.c
     src/widgets/util.c
     src/widgets/bolt.c
+    src/widgets/art.c
+    src/widgets/peripheral_status.c
 )
