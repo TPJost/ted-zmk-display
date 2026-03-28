@@ -7,6 +7,8 @@
 
 #include <string.h>
 #include <zephyr/kernel.h>
+#include <lvgl.h>
+#include <lvgl/src/widgets/canvas/lv_canvas.h>
 
 #include "util.h"
 
