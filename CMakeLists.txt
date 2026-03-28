@@ -7,6 +7,10 @@ zephyr_library_sources(
     src/widgets/status.c
     src/widgets/util.c
     src/widgets/bolt.c
-    src/widgets/art.c
-    src/widgets/peripheral_status.c
+)
+
+zephyr_library_include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/widgets
+    ${ZEPHYR_BASE}/../zmk/app/include
 )
