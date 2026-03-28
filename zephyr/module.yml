@@ -1,4 +1,4 @@
-name: ted-zmk-display
+name: zmk-vfx-ted-display
 build:
   cmake: .
   kconfig: Kconfig
