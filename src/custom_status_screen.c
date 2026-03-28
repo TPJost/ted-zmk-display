@@ -5,10 +5,13 @@
  *
  */
 
+#if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
 #include "widgets/status.h"
+#else
+#include "widgets/peripheral_status.h"
+#endif
 
 #include <zephyr/logging/log.h>
-
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #if IS_ENABLED(CONFIG_NICE_VIEW_WIDGET_STATUS)
@@ -16,7 +19,8 @@ static struct zmk_widget_status status_widget;
 #endif
 
 lv_obj_t *zmk_display_status_screen(void) {
-    lv_obj_t *screen = lv_obj_create(NULL);
+    lv_obj_t *screen;
+    screen = lv_obj_create(NULL);
 
 #if IS_ENABLED(CONFIG_NICE_VIEW_WIDGET_STATUS)
     zmk_widget_status_init(&status_widget, screen);
