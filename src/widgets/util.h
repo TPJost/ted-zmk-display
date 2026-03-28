@@ -5,13 +5,15 @@
  *
  */
 
+#pragma once
+
 #include <lvgl.h>
 #include <zmk/endpoints.h>
 
 #define NICEVIEW_PROFILE_COUNT 5
 
 #define CANVAS_SIZE 68
-#define CANVAS_COLOR_FORMAT LV_COLOR_FORMAT_L8 // smallest type supported by sw_rotate
+#define CANVAS_COLOR_FORMAT LV_COLOR_FORMAT_L8 /* Smallest type supported by sw_rotate */
 #define CANVAS_BUF_SIZE                                                                            \
     LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
                        LV_DRAW_BUF_STRIDE_ALIGN)
@@ -33,7 +35,6 @@ struct status_state {
     bool profiles_bonded[NICEVIEW_PROFILE_COUNT];
     uint8_t layer_index;
     const char *layer_label;
-    uint8_t wpm[10];
 #else
     bool connected;
 #endif
@@ -48,6 +49,7 @@ struct battery_status_state {
 
 void rotate_canvas(lv_obj_t *canvas);
 void draw_battery(lv_obj_t *canvas, const struct status_state *state);
+
 void init_label_dsc(lv_draw_label_dsc_t *label_dsc, lv_color_t color, const lv_font_t *font,
                     lv_text_align_t align);
 void init_rect_dsc(lv_draw_rect_dsc_t *rect_dsc, lv_color_t bg_color);
