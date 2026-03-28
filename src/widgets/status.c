@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <zephyr/kernel.h>
 #include <lvgl.h>
-#include <widgets/canvas/lv_canvas.h>
+#include <widgets/lv_canvas.h>
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
