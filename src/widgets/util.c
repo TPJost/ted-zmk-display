@@ -12,15 +12,19 @@
 
 LV_IMG_DECLARE(bolt);
 
-void rotate_canvas(lv_obj_t *canvas) {
-    uint8_t *buf = lv_canvas_get_draw_buf(canvas)->data;
-    static uint8_t buf_copy[CANVAS_BUF_SIZE];
+void rotate_canvas(lv_obj_t *canvas, lv_color_t *cbuf) {
+    lv_color_t cbuf_tmp[CANVAS_SIZE * CANVAS_SIZE];
 
-    memcpy(buf_copy, buf, sizeof(buf_copy));
+    memcpy(cbuf_tmp, cbuf, sizeof(cbuf_tmp));
 
-    const uint32_t stride = lv_draw_buf_width_to_stride(CANVAS_SIZE, CANVAS_COLOR_FORMAT);
-    lv_draw_sw_rotate(buf_copy, buf, CANVAS_SIZE, CANVAS_SIZE, stride, stride,
-                      LV_DISPLAY_ROTATION_270, CANVAS_COLOR_FORMAT);
+    for (int x = 0; x < CANVAS_SIZE; x++) {
+        for (int y = 0; y < CANVAS_SIZE; y++) {
+            cbuf[x * CANVAS_SIZE + (CANVAS_SIZE - 1 - y)] =
+                cbuf_tmp[y * CANVAS_SIZE + x];
+        }
+    }
+
+    lv_canvas_set_buffer(canvas, cbuf, CANVAS_SIZE, CANVAS_SIZE, LV_IMG_CF_TRUE_COLOR);
 }
 
 void draw_battery(lv_obj_t *canvas, const struct status_state *state) {
@@ -70,66 +74,75 @@ void init_arc_dsc(lv_draw_arc_dsc_t *arc_dsc, lv_color_t color, uint8_t width) {
 
 void canvas_draw_line(lv_obj_t *canvas, const lv_point_t points[], uint32_t point_cnt,
                       lv_draw_line_dsc_t *draw_dsc) {
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
-
+    lv_objmask_mask_t *mask = lv_canvas_init_layer(canvas);
     for (uint32_t i = 1; i < point_cnt; ++i) {
         draw_dsc->p1.x = points[i - 1].x;
         draw_dsc->p1.y = points[i - 1].y;
         draw_dsc->p2.x = points[i].x;
         draw_dsc->p2.y = points[i].y;
-        lv_draw_line(&layer, draw_dsc);
+        lv_draw_line(lv_canvas_get_layer(canvas), draw_dsc);
     }
-
-    lv_canvas_finish_layer(canvas, &layer);
+    lv_canvas_finish_layer(canvas, mask);
 }
 
 void canvas_draw_rect(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
                       lv_draw_rect_dsc_t *draw_dsc) {
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
-
-    lv_area_t coords = {x, y, x + w - 1, y + h - 1};
-    lv_draw_rect(&layer, draw_dsc, &coords);
-
-    lv_canvas_finish_layer(canvas, &layer);
+    lv_objmask_mask_t *mask = lv_canvas_init_layer(canvas);
+    lv_area_t coords = {
+        .x1 = x,
+        .y1 = y,
+        .x2 = x + w - 1,
+        .y2 = y + h - 1,
+    };
+    lv_draw_rect(lv_canvas_get_layer(canvas), draw_dsc, &coords);
+    lv_canvas_finish_layer(canvas, mask);
 }
 
 void canvas_draw_arc(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r,
                      int32_t start_angle, int32_t end_angle, lv_draw_arc_dsc_t *draw_dsc) {
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
+    lv_objmask_mask_t *mask = lv_canvas_init_layer(canvas);
 
     draw_dsc->center.x = x;
     draw_dsc->center.y = y;
     draw_dsc->radius = r;
     draw_dsc->start_angle = start_angle;
     draw_dsc->end_angle = end_angle;
-    lv_draw_arc(&layer, draw_dsc);
 
-    lv_canvas_finish_layer(canvas, &layer);
+    lv_draw_arc(lv_canvas_get_layer(canvas), draw_dsc);
+    lv_canvas_finish_layer(canvas, mask);
 }
 
 void canvas_draw_text(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w,
                       lv_draw_label_dsc_t *draw_dsc, const char *txt) {
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
+    lv_objmask_mask_t *mask = lv_canvas_init_layer(canvas);
 
-    draw_dsc->text = txt;
-    lv_area_t coords = {x, y, x + max_w, y + CANVAS_SIZE};
-    lv_draw_label(&layer, draw_dsc, &coords);
+    lv_area_t coords = {
+        .x1 = x,
+        .y1 = y,
+        .x2 = x + max_w,
+        .y2 = y + CANVAS_SIZE,
+    };
 
-    lv_canvas_finish_layer(canvas, &layer);
+    lv_draw_label_dsc_t local_dsc = *draw_dsc;
+    local_dsc.flag = 0;
+
+    lv_draw_label(lv_canvas_get_layer(canvas), &local_dsc, &coords, txt, NULL);
+
+    lv_canvas_finish_layer(canvas, mask);
 }
 
 void canvas_draw_img(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, const lv_img_dsc_t *src,
                      lv_draw_img_dsc_t *draw_dsc) {
-    lv_layer_t layer;
-    lv_canvas_init_layer(canvas, &layer);
+    lv_objmask_mask_t *mask = lv_canvas_init_layer(canvas);
 
-    draw_dsc->src = src;
-    lv_area_t coords = {x, y, x + src->header.w - 1, y + src->header.h - 1};
-    lv_draw_img(&layer, draw_dsc, &coords);
+    lv_area_t coords = {
+        .x1 = x,
+        .y1 = y,
+        .x2 = x + src->header.w - 1,
+        .y2 = y + src->header.h - 1,
+    };
 
-    lv_canvas_finish_layer(canvas, &layer);
+    lv_draw_img(lv_canvas_get_layer(canvas), &coords, src, draw_dsc);
+
+    lv_canvas_finish_layer(canvas, mask);
 }
