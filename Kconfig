@@ -1,7 +1,7 @@
 menu "Ted display module"
 
-config ZMK_VFX_TED_DISPLAY
-    bool "Enable Ted display module"
+config NICE_VIEW_WIDGET_STATUS
+    bool "Enable Ted custom status widget"
     default y
 
 endmenu
