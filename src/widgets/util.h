@@ -1,68 +1,73 @@
-/*
- *
- * Copyright (c) 2025 The ZMK Contributors
- * SPDX-License-Identifier: MIT
- *
- */
-
-#pragma once
-
-#include <lvgl.h>
-#include <zmk/endpoints.h>
-
-#define NICEVIEW_PROFILE_COUNT 5
-
-#define CANVAS_SIZE 68
-#define CANVAS_COLOR_FORMAT LV_COLOR_FORMAT_L8 /* Smallest type supported by sw_rotate */
-#define CANVAS_BUF_SIZE                                                                            \
-    LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
-                       LV_DRAW_BUF_STRIDE_ALIGN)
-
-#define LVGL_BACKGROUND                                                                            \
-    IS_ENABLED(CONFIG_NICE_VIEW_WIDGET_INVERTED) ? lv_color_black() : lv_color_white()
-#define LVGL_FOREGROUND                                                                            \
-    IS_ENABLED(CONFIG_NICE_VIEW_WIDGET_INVERTED) ? lv_color_white() : lv_color_black()
-
-struct status_state {
-    uint8_t battery;
-    bool charging;
-#if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
-    struct zmk_endpoint_instance selected_endpoint;
-    int active_profile_index;
-    bool active_profile_connected;
-    bool active_profile_bonded;
-    bool profiles_connected[NICEVIEW_PROFILE_COUNT];
-    bool profiles_bonded[NICEVIEW_PROFILE_COUNT];
-    uint8_t layer_index;
-    const char *layer_label;
-#else
-    bool connected;
-#endif
-};
-
-struct battery_status_state {
-    uint8_t level;
-#if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
-    bool usb_present;
-#endif
-};
-
-void rotate_canvas(lv_obj_t *canvas);
-void draw_battery(lv_obj_t *canvas, const struct status_state *state);
-
-void init_label_dsc(lv_draw_label_dsc_t *label_dsc, lv_color_t color, const lv_font_t *font,
-                    lv_text_align_t align);
-void init_rect_dsc(lv_draw_rect_dsc_t *rect_dsc, lv_color_t bg_color);
-void init_line_dsc(lv_draw_line_dsc_t *line_dsc, lv_color_t color, uint8_t width);
-void init_arc_dsc(lv_draw_arc_dsc_t *arc_dsc, lv_color_t color, uint8_t width);
-
-void canvas_draw_line(lv_obj_t *canvas, const lv_point_t points[], uint32_t point_cnt,
-                      lv_draw_line_dsc_t *draw_dsc);
-void canvas_draw_rect(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
-                      lv_draw_rect_dsc_t *draw_dsc);
-void canvas_draw_arc(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r,
-                     int32_t start_angle, int32_t end_angle, lv_draw_arc_dsc_t *draw_dsc);
-void canvas_draw_text(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w,
-                      lv_draw_label_dsc_t *draw_dsc, const char *txt);
-void canvas_draw_img(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, const lv_img_dsc_t *src,
-                     lv_draw_img_dsc_t *draw_dsc);
+AILED: modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/custom_status_screen.c.obj 
+ccache /opt/zephyr-sdk-0.16.9/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc -DKERNEL -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=/__w/corne-config/corne-config/zephyr/modules/lvgl/include/lv_conf.h -DNRF52840_XXAA -DPB_MAX_REQUIRED_FIELDS=64 -DPB_NO_ENCODE_SIZE_CHECK -DPB_NO_ERRMSG -DPB_WITHOUT_64BIT -DPICOLIBC_INTEGER_PRINTF_SCANF -D_FORTIFY_SOURCE=1 -D_POSIX_C_SOURCE=200809 -D__LINUX_ERRNO_EXTENSIONS__ -D__PROGRAM_START -D__ZEPHYR__=1 -I/__w/corne-config/corne-config/ted-zmk-display/src -I/__w/corne-config/corne-config/ted-zmk-display/src/widgets -I/__w/corne-config/corne-config/zephyr/../zmk/app/include -I/__w/corne-config/corne-config/zephyr/include -I/tmp/tmp.zTUFv9DGSd/zephyr/include/generated -I/__w/corne-config/corne-config/zephyr/soc/arm/nordic_nrf/nrf52 -I/__w/corne-config/corne-config/zephyr/soc/arm/nordic_nrf/common/. -I/__w/corne-config/corne-config/zephyr/subsys/usb/device -I/__w/corne-config/corne-config/zephyr/subsys/bluetooth/controller/ll_sw/nordic/hal/nrf5/nrfx_glue -I/__w/corne-config/corne-config/zephyr/subsys/bluetooth -I/__w/corne-config/corne-config/zephyr/subsys/settings/include -I/__w/corne-config/corne-config/modules/lib/nanopb -I/__w/corne-config/corne-config/modules/hal/cmsis/CMSIS/Core/Include -I/__w/corne-config/corne-config/zephyr/modules/cmsis/. -I/__w/corne-config/corne-config/modules/hal/nordic/nrfx -I/__w/corne-config/corne-config/modules/hal/nordic/nrfx/drivers/include -I/__w/corne-config/corne-config/modules/hal/nordic/nrfx/mdk -I/__w/corne-config/corne-config/zephyr/modules/hal_nordic/nrfx/. -I/__w/corne-config/corne-config/modules/lib/gui/lvgl/src -I/__w/corne-config/corne-config/zephyr/modules/lvgl/include -I/__w/corne-config/corne-config/modules/crypto/tinycrypt/lib/include -I/__w/corne-config/corne-config/zmk/app/module/include -I/__w/corne-config/corne-config/zmk/app/module/drivers/sensor/battery/. -fno-strict-aliasing -Os -imacros /tmp/tmp.zTUFv9DGSd/zephyr/include/generated/autoconf.h -fno-printf-return-value -fno-common -g -gdwarf-4 -fdiagnostics-color=always -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mfp16-format=ieee --sysroot=/opt/zephyr-sdk-0.16.9/arm-zephyr-eabi/arm-zephyr-eabi -imacros /__w/corne-config/corne-config/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -ftls-model=local-exec -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/__w/corne-config/corne-config/zmk/app=CMAKE_SOURCE_DIR -fmacro-prefix-map=/__w/corne-config/corne-config/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/__w/corne-config/corne-config=WEST_TOPDIR -ffunction-sections -fdata-sections --specs=picolibc.specs -std=c99 -Wfatal-errors -MD -MT modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/custom_status_screen.c.obj -MF modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/custom_status_screen.c.obj.d -o modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/custom_status_screen.c.obj -c /__w/corne-config/corne-config/ted-zmk-display/src/custom_status_screen.c
+In file included from /__w/corne-config/corne-config/ted-zmk-display/src/widgets/status.h:13,
+                 from /__w/corne-config/corne-config/ted-zmk-display/src/custom_status_screen.c:8:
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:18:5: warning: implicit declaration of function 'LV_CANVAS_BUF_SIZE'; did you mean 'CANVAS_BUF_SIZE'? [-Wimplicit-function-declaration]
+   18 |     LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
+      |     ^~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:18:5: note: in definition of macro 'CANVAS_BUF_SIZE'
+   18 |     LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
+      |     ^~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:18:50: warning: implicit declaration of function 'LV_COLOR_FORMAT_GET_BPP' [-Wimplicit-function-declaration]
+   18 |     LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
+      |                                                  ^~~~~~~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:18:50: note: in definition of macro 'CANVAS_BUF_SIZE'
+   18 |     LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
+      |                                                  ^~~~~~~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:16:29: error: 'LV_COLOR_FORMAT_L8' undeclared here (not in a function); did you mean 'LV_COLOR_MAKE8'?
+   16 | #define CANVAS_COLOR_FORMAT LV_COLOR_FORMAT_L8 /* Smallest type supported by sw_rotate */
+      |                             ^~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:16:29: note: in definition of macro 'CANVAS_COLOR_FORMAT'
+   16 | #define CANVAS_COLOR_FORMAT LV_COLOR_FORMAT_L8 /* Smallest type supported by sw_rotate */
+      |                             ^~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/status.h:18:18: note: in expansion of macro 'CANVAS_BUF_SIZE'
+   18 |     uint8_t cbuf[CANVAS_BUF_SIZE];
+      |                  ^~~~~~~~~~~~~~~
+compilation terminated due to -Wfatal-errors.
+[318/568] Building C object modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/status.c.obj
+FAILED: modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/status.c.obj 
+ccache /opt/zephyr-sdk-0.16.9/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc -DKERNEL -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=/__w/corne-config/corne-config/zephyr/modules/lvgl/include/lv_conf.h -DNRF52840_XXAA -DPB_MAX_REQUIRED_FIELDS=64 -DPB_NO_ENCODE_SIZE_CHECK -DPB_NO_ERRMSG -DPB_WITHOUT_64BIT -DPICOLIBC_INTEGER_PRINTF_SCANF -D_FORTIFY_SOURCE=1 -D_POSIX_C_SOURCE=200809 -D__LINUX_ERRNO_EXTENSIONS__ -D__PROGRAM_START -D__ZEPHYR__=1 -I/__w/corne-config/corne-config/ted-zmk-display/src -I/__w/corne-config/corne-config/ted-zmk-display/src/widgets -I/__w/corne-config/corne-config/zephyr/../zmk/app/include -I/__w/corne-config/corne-config/zephyr/include -I/tmp/tmp.zTUFv9DGSd/zephyr/include/generated -I/__w/corne-config/corne-config/zephyr/soc/arm/nordic_nrf/nrf52 -I/__w/corne-config/corne-config/zephyr/soc/arm/nordic_nrf/common/. -I/__w/corne-config/corne-config/zephyr/subsys/usb/device -I/__w/corne-config/corne-config/zephyr/subsys/bluetooth/controller/ll_sw/nordic/hal/nrf5/nrfx_glue -I/__w/corne-config/corne-config/zephyr/subsys/bluetooth -I/__w/corne-config/corne-config/zephyr/subsys/settings/include -I/__w/corne-config/corne-config/modules/lib/nanopb -I/__w/corne-config/corne-config/modules/hal/cmsis/CMSIS/Core/Include -I/__w/corne-config/corne-config/zephyr/modules/cmsis/. -I/__w/corne-config/corne-config/modules/hal/nordic/nrfx -I/__w/corne-config/corne-config/modules/hal/nordic/nrfx/drivers/include -I/__w/corne-config/corne-config/modules/hal/nordic/nrfx/mdk -I/__w/corne-config/corne-config/zephyr/modules/hal_nordic/nrfx/. -I/__w/corne-config/corne-config/modules/lib/gui/lvgl/src -I/__w/corne-config/corne-config/zephyr/modules/lvgl/include -I/__w/corne-config/corne-config/modules/crypto/tinycrypt/lib/include -I/__w/corne-config/corne-config/zmk/app/module/include -I/__w/corne-config/corne-config/zmk/app/module/drivers/sensor/battery/. -fno-strict-aliasing -Os -imacros /tmp/tmp.zTUFv9DGSd/zephyr/include/generated/autoconf.h -fno-printf-return-value -fno-common -g -gdwarf-4 -fdiagnostics-color=always -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mfp16-format=ieee --sysroot=/opt/zephyr-sdk-0.16.9/arm-zephyr-eabi/arm-zephyr-eabi -imacros /__w/corne-config/corne-config/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -ftls-model=local-exec -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/__w/corne-config/corne-config/zmk/app=CMAKE_SOURCE_DIR -fmacro-prefix-map=/__w/corne-config/corne-config/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/__w/corne-config/corne-config=WEST_TOPDIR -ffunction-sections -fdata-sections --specs=picolibc.specs -std=c99 -Wfatal-errors -MD -MT modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/status.c.obj -MF modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/status.c.obj.d -o modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/status.c.obj -c /__w/corne-config/corne-config/ted-zmk-display/src/widgets/status.c
+In file included from /__w/corne-config/corne-config/ted-zmk-display/src/widgets/status.h:13,
+                 from /__w/corne-config/corne-config/ted-zmk-display/src/widgets/status.c:27:
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:18:5: warning: implicit declaration of function 'LV_CANVAS_BUF_SIZE'; did you mean 'CANVAS_BUF_SIZE'? [-Wimplicit-function-declaration]
+   18 |     LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
+      |     ^~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:18:5: note: in definition of macro 'CANVAS_BUF_SIZE'
+   18 |     LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
+      |     ^~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:18:50: warning: implicit declaration of function 'LV_COLOR_FORMAT_GET_BPP' [-Wimplicit-function-declaration]
+   18 |     LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
+      |                                                  ^~~~~~~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:18:50: note: in definition of macro 'CANVAS_BUF_SIZE'
+   18 |     LV_CANVAS_BUF_SIZE(CANVAS_SIZE, CANVAS_SIZE, LV_COLOR_FORMAT_GET_BPP(CANVAS_COLOR_FORMAT),     \
+      |                                                  ^~~~~~~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:16:29: error: 'LV_COLOR_FORMAT_L8' undeclared here (not in a function); did you mean 'LV_COLOR_SET_G8'?
+   16 | #define CANVAS_COLOR_FORMAT LV_COLOR_FORMAT_L8 /* Smallest type supported by sw_rotate */
+      |                             ^~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.h:16:29: note: in definition of macro 'CANVAS_COLOR_FORMAT'
+   16 | #define CANVAS_COLOR_FORMAT LV_COLOR_FORMAT_L8 /* Smallest type supported by sw_rotate */
+      |                             ^~~~~~~~~~~~~~~~~~
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/status.h:18:18: note: in expansion of macro 'CANVAS_BUF_SIZE'
+   18 |     uint8_t cbuf[CANVAS_BUF_SIZE];
+      |                  ^~~~~~~~~~~~~~~
+compilation terminated due to -Wfatal-errors.
+[319/568] Building C object modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/util.c.obj
+FAILED: modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/util.c.obj 
+ccache /opt/zephyr-sdk-0.16.9/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc -DKERNEL -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_CONF_PATH=/__w/corne-config/corne-config/zephyr/modules/lvgl/include/lv_conf.h -DNRF52840_XXAA -DPB_MAX_REQUIRED_FIELDS=64 -DPB_NO_ENCODE_SIZE_CHECK -DPB_NO_ERRMSG -DPB_WITHOUT_64BIT -DPICOLIBC_INTEGER_PRINTF_SCANF -D_FORTIFY_SOURCE=1 -D_POSIX_C_SOURCE=200809 -D__LINUX_ERRNO_EXTENSIONS__ -D__PROGRAM_START -D__ZEPHYR__=1 -I/__w/corne-config/corne-config/ted-zmk-display/src -I/__w/corne-config/corne-config/ted-zmk-display/src/widgets -I/__w/corne-config/corne-config/zephyr/../zmk/app/include -I/__w/corne-config/corne-config/zephyr/include -I/tmp/tmp.zTUFv9DGSd/zephyr/include/generated -I/__w/corne-config/corne-config/zephyr/soc/arm/nordic_nrf/nrf52 -I/__w/corne-config/corne-config/zephyr/soc/arm/nordic_nrf/common/. -I/__w/corne-config/corne-config/zephyr/subsys/usb/device -I/__w/corne-config/corne-config/zephyr/subsys/bluetooth/controller/ll_sw/nordic/hal/nrf5/nrfx_glue -I/__w/corne-config/corne-config/zephyr/subsys/bluetooth -I/__w/corne-config/corne-config/zephyr/subsys/settings/include -I/__w/corne-config/corne-config/modules/lib/nanopb -I/__w/corne-config/corne-config/modules/hal/cmsis/CMSIS/Core/Include -I/__w/corne-config/corne-config/zephyr/modules/cmsis/. -I/__w/corne-config/corne-config/modules/hal/nordic/nrfx -I/__w/corne-config/corne-config/modules/hal/nordic/nrfx/drivers/include -I/__w/corne-config/corne-config/modules/hal/nordic/nrfx/mdk -I/__w/corne-config/corne-config/zephyr/modules/hal_nordic/nrfx/. -I/__w/corne-config/corne-config/modules/lib/gui/lvgl/src -I/__w/corne-config/corne-config/zephyr/modules/lvgl/include -I/__w/corne-config/corne-config/modules/crypto/tinycrypt/lib/include -I/__w/corne-config/corne-config/zmk/app/module/include -I/__w/corne-config/corne-config/zmk/app/module/drivers/sensor/battery/. -fno-strict-aliasing -Os -imacros /tmp/tmp.zTUFv9DGSd/zephyr/include/generated/autoconf.h -fno-printf-return-value -fno-common -g -gdwarf-4 -fdiagnostics-color=always -mcpu=cortex-m4 -mthumb -mabi=aapcs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mfp16-format=ieee --sysroot=/opt/zephyr-sdk-0.16.9/arm-zephyr-eabi/arm-zephyr-eabi -imacros /__w/corne-config/corne-config/zephyr/include/zephyr/toolchain/zephyr_stdint.h -Wall -Wformat -Wformat-security -Wno-format-zero-length -Wno-pointer-sign -Wpointer-arith -Wexpansion-to-defined -Wno-unused-but-set-variable -Werror=implicit-int -fno-pic -fno-pie -fno-asynchronous-unwind-tables -ftls-model=local-exec -fno-reorder-functions --param=min-pagesize=0 -fno-defer-pop -fmacro-prefix-map=/__w/corne-config/corne-config/zmk/app=CMAKE_SOURCE_DIR -fmacro-prefix-map=/__w/corne-config/corne-config/zephyr=ZEPHYR_BASE -fmacro-prefix-map=/__w/corne-config/corne-config=WEST_TOPDIR -ffunction-sections -fdata-sections --specs=picolibc.specs -std=c99 -Wfatal-errors -MD -MT modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/util.c.obj -MF modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/util.c.obj.d -o modules/zmk-vfx-ted-display/CMakeFiles/..__ted-zmk-display.dir/src/widgets/util.c.obj -c /__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.c
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.c: In function 'rotate_canvas':
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.c:16:20: warning: implicit declaration of function 'lv_canvas_get_draw_buf'; did you mean 'lv_disp_get_draw_buf'? [-Wimplicit-function-declaration]
+   16 |     uint8_t *buf = lv_canvas_get_draw_buf(canvas)->data;
+      |                    ^~~~~~~~~~~~~~~~~~~~~~
+      |                    lv_disp_get_draw_buf
+/__w/corne-config/corne-config/ted-zmk-display/src/widgets/util.c:16:50: error: invalid type argument of '->' (have 'int')
+   16 |     uint8_t *buf = lv_canvas_get_draw_buf(canvas)->data;
+      |                                                  ^~
+compilation terminated due to -Wfatal-errors.
+ninja: build stopped: subcommand failed.
+FATAL ERROR: command exited with status 1: /usr/local/bin/cmake --build /tmp/tmp.zTUFv9DGSd
+Error: Process completed with exit code 1.
+0s
+0s
+0s
+0s
+0s
