@@ -23,8 +23,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include "peripheral_status.h"
 
-LV_IMG_DECLARE(balloon);
-LV_IMG_DECLARE(mountain);
+extern const lv_img_dsc_t balloon;
+extern const lv_img_dsc_t mountain;
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
