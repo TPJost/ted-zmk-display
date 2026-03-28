@@ -10,7 +10,7 @@
 
 #include "util.h"
 
-LV_IMG_DECLARE(bolt);
+extern const lv_img_dsc_t bolt;
 
 void rotate_canvas(lv_obj_t *canvas, lv_color_t *cbuf) {
     lv_color_t cbuf_tmp[CANVAS_SIZE * CANVAS_SIZE];
