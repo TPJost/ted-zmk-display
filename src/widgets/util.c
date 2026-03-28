@@ -5,6 +5,7 @@
  *
  */
 
+#include <string.h>
 #include <zephyr/kernel.h>
 
 #include "util.h"
@@ -14,6 +15,7 @@ LV_IMG_DECLARE(bolt);
 void rotate_canvas(lv_obj_t *canvas) {
     uint8_t *buf = lv_canvas_get_draw_buf(canvas)->data;
     static uint8_t buf_copy[CANVAS_BUF_SIZE];
+
     memcpy(buf_copy, buf, sizeof(buf_copy));
 
     const uint32_t stride = lv_draw_buf_width_to_stride(CANVAS_SIZE, CANVAS_COLOR_FORMAT);
@@ -35,8 +37,8 @@ void draw_battery(lv_obj_t *canvas, const struct status_state *state) {
     canvas_draw_rect(canvas, 31, 6, 1, 4, &rect_black_dsc);
 
     if (state->charging) {
-        lv_draw_image_dsc_t img_dsc;
-        lv_draw_image_dsc_init(&img_dsc);
+        lv_draw_img_dsc_t img_dsc;
+        lv_draw_img_dsc_init(&img_dsc);
         canvas_draw_img(canvas, 9, -1, &bolt, &img_dsc);
     }
 }
@@ -120,14 +122,14 @@ void canvas_draw_text(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, lv_coord_t m
     lv_canvas_finish_layer(canvas, &layer);
 }
 
-void canvas_draw_img(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, const lv_image_dsc_t *src,
-                     lv_draw_image_dsc_t *draw_dsc) {
+void canvas_draw_img(lv_obj_t *canvas, lv_coord_t x, lv_coord_t y, const lv_img_dsc_t *src,
+                     lv_draw_img_dsc_t *draw_dsc) {
     lv_layer_t layer;
     lv_canvas_init_layer(canvas, &layer);
 
     draw_dsc->src = src;
     lv_area_t coords = {x, y, x + src->header.w - 1, y + src->header.h - 1};
-    lv_draw_image(&layer, draw_dsc, &coords);
+    lv_draw_img(&layer, draw_dsc, &coords);
 
     lv_canvas_finish_layer(canvas, &layer);
 }
