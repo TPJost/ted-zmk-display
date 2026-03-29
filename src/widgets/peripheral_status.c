@@ -5,8 +5,11 @@
  *
  */
 
+#include <string.h>
 #include <zephyr/kernel.h>
 #include <zephyr/random/random.h>
+#include <lvgl.h>
+#include <widgets/lv_canvas.h>
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
@@ -37,20 +40,21 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
 
     lv_draw_label_dsc_t label_dsc;
     init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_montserrat_12, LV_TEXT_ALIGN_RIGHT);
+
     lv_draw_rect_dsc_t rect_black_dsc;
     init_rect_dsc(&rect_black_dsc, LVGL_BACKGROUND);
 
-    // Fill background
+    /* Fill background */
     canvas_draw_rect(canvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE, &rect_black_dsc);
 
-    // Draw battery
+    /* Draw battery */
     draw_battery(canvas, state);
 
-    // Draw output status
+    /* Draw connection status */
     canvas_draw_text(canvas, 0, 0, CANVAS_SIZE, &label_dsc,
                      state->connected ? LV_SYMBOL_WIFI : LV_SYMBOL_CLOSE);
 
-    // Rotate canvas
+    /* Rotate canvas */
     rotate_canvas(canvas, cbuf);
 }
 
@@ -67,10 +71,14 @@ static void set_battery_status(struct zmk_widget_status *widget,
 
 static void battery_status_update_cb(struct battery_status_state state) {
     struct zmk_widget_status *widget;
-    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_battery_status(widget, state); }
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
+        set_battery_status(widget, state);
+    }
 }
 
 static struct battery_status_state battery_status_get_state(const zmk_event_t *eh) {
+    ARG_UNUSED(eh);
+
     return (struct battery_status_state){
         .level = zmk_battery_state_of_charge(),
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
@@ -87,8 +95,12 @@ ZMK_SUBSCRIPTION(widget_battery_status, zmk_battery_state_changed);
 ZMK_SUBSCRIPTION(widget_battery_status, zmk_usb_conn_state_changed);
 #endif /* IS_ENABLED(CONFIG_USB_DEVICE_STACK) */
 
-static struct peripheral_status_state get_state(const zmk_event_t *_eh) {
-    return (struct peripheral_status_state){.connected = zmk_split_bt_peripheral_is_connected()};
+static struct peripheral_status_state get_state(const zmk_event_t *eh) {
+    ARG_UNUSED(eh);
+
+    return (struct peripheral_status_state){
+        .connected = zmk_split_bt_peripheral_is_connected(),
+    };
 }
 
 static void set_connection_status(struct zmk_widget_status *widget,
@@ -100,30 +112,37 @@ static void set_connection_status(struct zmk_widget_status *widget,
 
 static void output_status_update_cb(struct peripheral_status_state state) {
     struct zmk_widget_status *widget;
-    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) { set_connection_status(widget, state); }
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
+        set_connection_status(widget, state);
+    }
 }
 
 ZMK_DISPLAY_WIDGET_LISTENER(widget_peripheral_status, struct peripheral_status_state,
                             output_status_update_cb, get_state)
+
 ZMK_SUBSCRIPTION(widget_peripheral_status, zmk_split_peripheral_status_changed);
 
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
     lv_obj_set_size(widget->obj, 160, 68);
+
     lv_obj_t *top = lv_canvas_create(widget->obj);
     lv_obj_align(top, LV_ALIGN_TOP_RIGHT, 0, 0);
-    lv_canvas_set_buffer(top, widget->cbuf, CANVAS_SIZE, CANVAS_SIZE, CANVAS_COLOR_FORMAT);
+    lv_canvas_set_buffer(top, widget->cbuf, CANVAS_SIZE, CANVAS_SIZE, LV_IMG_CF_TRUE_COLOR);
 
     lv_obj_t *art = lv_img_create(widget->obj);
-    bool random = sys_rand32_get() & 1;
-    lv_image_set_src(art, random ? &balloon : &mountain);
+    bool random = (sys_rand32_get() & 1U) != 0U;
+    lv_img_set_src(art, random ? &balloon : &mountain);
     lv_obj_align(art, LV_ALIGN_TOP_LEFT, 0, 0);
 
     sys_slist_append(&widgets, &widget->node);
+
     widget_battery_status_init();
     widget_peripheral_status_init();
 
     return 0;
 }
 
-lv_obj_t *zmk_widget_status_obj(struct zmk_widget_status *widget) { return widget->obj; }
+lv_obj_t *zmk_widget_status_obj(struct zmk_widget_status *widget) {
+    return widget->obj;
+}
